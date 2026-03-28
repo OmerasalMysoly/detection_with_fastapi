@@ -1,0 +1,7 @@
+.env
+**/__pycache__/
+.github/
+api_env/
+.vscode/
+logs.txt
+.venv
