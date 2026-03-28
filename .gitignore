@@ -5,3 +5,4 @@ api_env/
 .vscode/
 logs.txt
 .venv
+runs
