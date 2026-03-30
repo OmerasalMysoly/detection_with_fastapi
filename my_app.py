@@ -32,9 +32,9 @@ def hello(request: Request):
 def vision_detect(file: UploadFile = File(...)):
     contents = file.file.read()
     
-    detections = predict_image(contents)
+    detections, base64_image  = predict_image(contents)
 
-    return JSONResponse(content={"detections": detections}, status_code= 200)
+    return JSONResponse(content={"detections": detections, "image": base64_image}, status_code= 200)
 
 
 @app.post("/check-email")

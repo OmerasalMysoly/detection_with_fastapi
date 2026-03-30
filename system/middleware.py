@@ -46,7 +46,7 @@ class RequestLoggerMiddleware(BaseHTTPMiddleware):
 
         token_param = request.query_params.get("secret")
 
-        if request.url.path not in ["/", "/openapi.json", "/status", "/favicon.ico"]:
+        if request.url.path not in ["/", "/openapi.json", "/status", "/favicon.ico", "/vision-detect"]:
             if not token_param or token_param != SECRET_KEY:
                 response = Response("Unauthorized Access", status_code=401)
                 log_to_file(request, response, body_bytes)

@@ -1,28 +1,30 @@
 from ultralytics import YOLO
-import numpy as np
 import cv2
+import base64
+import tempfile
+import os
 
-model = YOLO("yolo26n.pt")
-
+model= YOLO("yolo26n.pt")
 
 def predict_image(image_bytes: bytes):
-    nparr = np.frombuffer(image_bytes, np.uint8)
-    image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    
-    results = model.predict(image)
-    
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
+        tmp.write(image_bytes)
+        tmp_path = tmp.name
+
+    results = model.predict(tmp_path)
+    os.remove(tmp_path)
+
     detections = []
+    annotated_image = None
     for result in results:
+        annotated_image = result.plot()
         for box in result.boxes:
             detections.append({
                 "label": model.names[int(box.cls)],
-                "confidence": round(float(box.conf), 2),
-                "bbox": {
-                    "x1": int(box.xyxy[0][0]),
-                    "y1": int(box.xyxy[0][1]),
-                    "x2": int(box.xyxy[0][2]),
-                    "y2": int(box.xyxy[0][3])
-                }
+                "confidence": round(float(box.conf), 2)
             })
-    
-    return detections
+
+    _, buffer = cv2.imencode(".jpg", annotated_image)
+    base64_image = base64.b64encode(buffer).decode("utf-8")
+
+    return detections, base64_image
